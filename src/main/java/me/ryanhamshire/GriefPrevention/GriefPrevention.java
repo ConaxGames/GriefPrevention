@@ -726,7 +726,7 @@ public class GriefPrevention extends JavaPlugin
         this.config_siege_blocks = EnumSet.noneOf(Material.class);
         this.config_siege_blocks.add(Material.DIRT);
         this.config_siege_blocks.add(Material.GRASS_BLOCK);
-        this.config_siege_blocks.add(Material.GRASS);
+        this.config_siege_blocks.add(Material.LEGACY_GRASS);
         this.config_siege_blocks.add(Material.FERN);
         this.config_siege_blocks.add(Material.DEAD_BUSH);
         this.config_siege_blocks.add(Material.COBBLESTONE);

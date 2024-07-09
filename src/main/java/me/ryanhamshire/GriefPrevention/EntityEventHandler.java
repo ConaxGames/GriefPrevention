@@ -337,7 +337,7 @@ public class EntityEventHandler implements Listener
     @EventHandler(ignoreCancelled = true)
     void onTNTExitPortal(EntityPortalExitEvent event)
     {
-        if (event.getEntityType() != EntityType.PRIMED_TNT)
+        if (event.getEntityType() != EntityType.TNT)
             return;
         if (event.getTo().getWorld().getEnvironment() != Environment.THE_END)
             return;
