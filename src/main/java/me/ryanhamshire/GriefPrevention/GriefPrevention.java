@@ -3507,50 +3507,46 @@ public class GriefPrevention extends JavaPlugin
         return this.allowBuild(player, location, location.getBlock().getType());
     }
 
-    public String allowBuild(Player player, Location location, Material material)
-    {
+    public String allowBuild(Player player, Location location, Material material) {
         if (!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
 
         PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
         Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
 
-        //exception: administrators in ignore claims mode
+        // exception: administrators in ignore claims mode
         if (playerData.ignoreClaims) return null;
 
-        //wilderness rules
-        if (claim == null)
-        {
-            //no building in the wilderness in creative mode
-            if (this.creativeRulesApply(location) || this.config_claims_worldModes.get(location.getWorld()) == ClaimsMode.SurvivalRequiringClaims)
-            {
-                //exception: when chest claims are enabled, players who have zero land claims and are placing a chest
-                if (material != Material.CHEST || playerData.getClaims().size() > 0 || GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == -1)
-                {
+        // wilderness rules
+        if (claim == null) {
+            // no building in the wilderness in creative mode
+            if (this.creativeRulesApply(location) || this.config_claims_worldModes.get(location.getWorld()) == ClaimsMode.SurvivalRequiringClaims) {
+                // exception: when chest claims are enabled, players who have zero land claims and are placing a chest
+                if (material != Material.CHEST || playerData.getClaims().size() > 0 || GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == -1) {
                     String reason = this.dataStore.getMessage(Messages.NoBuildOutsideClaims);
                     if (player.hasPermission("griefprevention.ignoreclaims"))
                         reason += "  " + this.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
                     reason += "  " + this.dataStore.getMessage(Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
                     return reason;
-                }
-                else
-                {
+                } else {
                     return null;
                 }
             }
-
-            //but it's fine in survival mode
-            else
-            {
+            // but it's fine in survival mode
+            else {
                 return null;
             }
         }
 
-        //if not in the wilderness, then apply claim rules (permissions, etc)
-        else
-        {
-            //cache the claim for later reference
+        // if not in the wilderness, then apply claim rules (permissions, etc)
+        else {
+            // cache the claim for later reference
             playerData.lastClaim = claim;
             Block block = location.getBlock();
+
+            // Validate that the material is a valid item before creating an ItemStack
+            if (!material.isItem()) {
+                return "Invalid material for building.";
+            }
 
             Supplier<String> supplier = claim.checkPermission(player, ClaimPermission.Build, new BlockPlaceEvent(block, block.getState(), block, new ItemStack(material), player, true, EquipmentSlot.HAND));
 
