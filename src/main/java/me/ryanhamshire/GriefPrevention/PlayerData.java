@@ -54,9 +54,6 @@ public class PlayerData
     //what "mode" the shovel is in determines what it will do when it's used
     public ShovelMode shovelMode = ShovelMode.Basic;
 
-    //radius for restore nature fill mode
-    int fillRadius = 0;
-
     //last place the player used the shovel, useful in creating and resizing claims,
     //because the player must use the shovel twice in those instances
     public Location lastShovelLocation = null;
@@ -72,9 +69,6 @@ public class PlayerData
 
     //whether this player was recently warned about building outside land claims
     boolean warnedAboutBuildingOutsideClaims = false;
-
-    //timestamp when last siege ended (where this player was the defender)
-    long lastSiegeEndTimeStamp = 0;
 
     //whether the player was kicked (set and used during logout)
     boolean wasKicked = false;
@@ -95,9 +89,6 @@ public class PlayerData
 
     //the last claim this player was in, that we know of
     public Claim lastClaim = null;
-
-    //siege
-    public SiegeData siegeData = null;
 
     //pvp
     public long lastPvpTimestamp = 0;
@@ -125,6 +116,9 @@ public class PlayerData
 
     //timestamp for last "you're building outside your land claims" message
     Long buildWarningTimestamp = null;
+
+    //timestamp for last warning when placing TNT on explosion protected claim
+    Long explosivesWarningTimestamp = null;
 
     //spot where a player can't talk, used to mute new players until they've moved a little
     //this is an anti-bot strategy.
