@@ -3501,61 +3501,45 @@ public class GriefPrevention extends JavaPlugin
         return this.config_claims_worldModes.get((location.getWorld())) == ClaimsMode.Creative;
     }
 
-    public String allowBuild(Player player, Location location)
+    /**
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     */
+    @Deprecated(forRemoval = true, since = "17.0.0")
+    public @Nullable String allowBuild(Player player, Location location)
     {
-        // TODO check all derivatives and rework API
         return this.allowBuild(player, location, location.getBlock().getType());
     }
 
-    public String allowBuild(Player player, Location location, Material material) {
+    /**
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     */
+    @Deprecated(forRemoval = true, since = "17.0.0")
+    public @Nullable String allowBuild(Player player, Location location, Material material)
+    {
         if (!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
 
-        PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-        Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
-
-        // exception: administrators in ignore claims mode
-        if (playerData.ignoreClaims) return null;
-
-        // wilderness rules
-        if (claim == null) {
-            // no building in the wilderness in creative mode
-            if (this.creativeRulesApply(location) || this.config_claims_worldModes.get(location.getWorld()) == ClaimsMode.SurvivalRequiringClaims) {
-                // exception: when chest claims are enabled, players who have zero land claims and are placing a chest
-                if (material != Material.CHEST || playerData.getClaims().size() > 0 || GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == -1) {
-                    String reason = this.dataStore.getMessage(Messages.NoBuildOutsideClaims);
-                    if (player.hasPermission("griefprevention.ignoreclaims"))
-                        reason += "  " + this.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
-                    reason += "  " + this.dataStore.getMessage(Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-                    return reason;
-                } else {
-                    return null;
-                }
+        ItemStack placed;
+        if (material.isItem())
+        {
+            placed = new ItemStack(material);
+        }
+        else
+        {
+            var blockType = material.asBlockType();
+            if (blockType != null && blockType.hasItemType())
+            {
+                placed = blockType.getItemType().createItemStack();
             }
-            // but it's fine in survival mode
-            else {
-                return null;
+            else
+            {
+                placed = new ItemStack(Material.DIRT);
             }
         }
 
-        // if not in the wilderness, then apply claim rules (permissions, etc)
-        else {
-            // cache the claim for later reference
-            playerData.lastClaim = claim;
-            Block block = location.getBlock();
-
-            // Validate that the material is a valid item before creating an ItemStack
-            if (!material.isItem()) {
-                return "Invalid material for building.";
-            }
-
-            Supplier<String> supplier = claim.checkPermission(player, ClaimPermission.Build, new BlockPlaceEvent(block, block.getState(), block, new ItemStack(material), player, true, EquipmentSlot.HAND));
-
-            if (supplier == null) return null;
-
-            return supplier.get();
-        }
+        Block block = location.getBlock();
+        Supplier<String> result = ProtectionHelper.checkPermission(player, location, ClaimPermission.Build, new BlockPlaceEvent(block, block.getState(), block, placed, player, true, EquipmentSlot.HAND));
+        return result == null ? null : result.get();
     }
-
     public String allowBreak(Player player, Block block, Location location)
     {
         return this.allowBreak(player, block, location, new BlockBreakEvent(block, player));
