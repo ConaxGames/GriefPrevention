@@ -19,6 +19,8 @@
 package me.ryanhamshire.GriefPrevention;
 
 import com.conaxgames.ConaxGP;
+import com.conaxgames.libraries.util.CC;
+import com.conaxgames.menu.GPConfirmMenu;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.griefprevention.commands.ClaimCommand;
@@ -1132,9 +1134,33 @@ public class GriefPrevention extends JavaPlugin
             //requires exactly one parameter, the other player's name
             if (args.length != 1) return false;
 
-            //most trust commands use this helper method, it keeps them consistent
-            this.handleTrustCommand(player, ClaimPermission.Build, args[0]);
+            // start conaxgames
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target == null) {
+                player.sendMessage(ChatColor.RED + "Unable to find a player called " + ChatColor.YELLOW + args[0] + ChatColor.RED + ".");
+                return false;
+            }
 
+            if (player.getUniqueId() == target.getUniqueId()) {
+                player.sendMessage(ChatColor.RED + "Unable to find a player called " + ChatColor.YELLOW + args[0] + ChatColor.RED + ".");
+                return false;
+            }
+
+            List<String> description = new ArrayList<>();
+            description.add(CC.GRAY + "Do you want to give " + CC.YELLOW + target.getName() + CC.GRAY + " access to build, break and take items from your claim?");
+            description.add(" ");
+            description.add(CC.RED + "We can't refund anything if is taken taken!");
+            description.add(" ");
+            description.add(CC.B_YELLOW + "ARE YOU SURE?");
+
+            Player finalPlayer = player;
+            new GPConfirmMenu("Are you sure?", response ->  {
+                if (response) {
+                    //most trust commands use this helper method, it keeps them consistent
+                    this.handleTrustCommand(finalPlayer, ClaimPermission.Build, args[0]);
+                }
+            }, description).openMenu(player);
+            // end conaxgames
             return true;
         }
 
@@ -2367,23 +2393,40 @@ public class GriefPrevention extends JavaPlugin
         }
         else
         {
-            //delete it
-            this.dataStore.deleteClaim(claim, true, false);
+            //start conaxgames
+            List<String> description = new ArrayList<>();
+            description.add(CC.GRAY + "Are you sure you want to un-claim this?");
+            description.add(" ");
+            description.add(CC.RED + "We can't refund your claim!");
+            description.add(" ");
+            description.add(CC.B_YELLOW + "ARE YOU SURE?");
 
-            //adjust claim blocks when abandoning a top level claim
-            if (this.config_claims_abandonReturnRatio != 1.0D && claim.parent == null && claim.ownerID.equals(playerData.playerID))
-            {
-                playerData.setAccruedClaimBlocks(playerData.getAccruedClaimBlocks() - (int) Math.ceil((claim.getArea() * (1 - this.config_claims_abandonReturnRatio))));
-            }
+            new GPConfirmMenu("Are you sure?", response -> {
+                if (response)
+                {
+                    //delete it
+                    this.dataStore.deleteClaim(claim, true, false);
 
-            //tell the player how many claim blocks he has left
-            int remainingBlocks = playerData.getRemainingClaimBlocks();
-            GriefPrevention.sendMessage(player, TextMode.Success, Messages.AbandonSuccess, String.valueOf(remainingBlocks));
+                    //adjust claim blocks when abandoning a top level claim
+                    if (this.config_claims_abandonReturnRatio != 1.0D && claim.parent == null && claim.ownerID.equals(playerData.playerID))
+                    {
+                        playerData.setAccruedClaimBlocks(playerData.getAccruedClaimBlocks() - (int) Math.ceil((claim.getArea() * (1 - this.config_claims_abandonReturnRatio))));
+                    }
 
-            //revert any current visualization
-            playerData.setVisibleBoundaries(null);
+                    //tell the player how many claim blocks he has left
+                    int remainingBlocks = playerData.getRemainingClaimBlocks();
+                    GriefPrevention.sendMessage(player, TextMode.Success, Messages.AbandonSuccess, String.valueOf(remainingBlocks));
 
-            playerData.warnedAboutMajorDeletion = false;
+                    //revert any current visualization
+                    playerData.setVisibleBoundaries(null);
+
+                    playerData.warnedAboutMajorDeletion = false;
+                }
+                else
+                {
+                    player.sendMessage(ChatColor.YELLOW + "Your claim has not changed...");
+                }
+            }, description).openMenu(player);
         }
 
         return true;
