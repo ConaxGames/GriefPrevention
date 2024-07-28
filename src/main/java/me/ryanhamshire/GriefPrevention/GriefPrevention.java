@@ -18,6 +18,7 @@
 
 package me.ryanhamshire.GriefPrevention;
 
+import com.conaxgames.ConaxGP;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.griefprevention.commands.ClaimCommand;
@@ -87,6 +88,9 @@ public class GriefPrevention extends JavaPlugin
 
     //this handles data storage, like player and region data
     public DataStore dataStore;
+
+    //this handles the denial of entry for players moving between claims.
+    public ConaxGP conaxGP;
 
     // Event handlers with common functionality
     EntityEventHandler entityEventHandler;
@@ -373,6 +377,8 @@ public class GriefPrevention extends JavaPlugin
         CacheOfflinePlayerNamesThread namesThread = new CacheOfflinePlayerNamesThread(offlinePlayers, this.playerNameToIDMap);
         namesThread.setPriority(Thread.MIN_PRIORITY);
         namesThread.start();
+
+        this.conaxGP = new ConaxGP();
 
         //load ignore lists for any already-online players
         @SuppressWarnings("unchecked")
@@ -2274,6 +2280,25 @@ public class GriefPrevention extends JavaPlugin
 
             return true;
         }
+
+        // claimban
+        else if (cmd.getName().equals("claimban"))
+        {
+            return conaxGP.claimban(sender, args[0]);
+        }
+
+        // claimunban
+        else if (cmd.getName().equals("claimunban"))
+        {
+            return conaxGP.claimunban(sender, args[0]);
+        }
+
+        // claimban list
+        else if (cmd.getName().equals("claimbanlist"))
+        {
+            return conaxGP.claimbanlist(sender);
+        }
+
         return false;
     }
 
