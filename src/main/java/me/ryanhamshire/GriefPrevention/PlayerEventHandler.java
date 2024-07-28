@@ -1512,15 +1512,9 @@ class PlayerEventHandler implements Listener
             clickedBlockType = Material.AIR;
         }
 
-        PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+        PlayerData playerData = null;
 
-        // Ensure playerData is not null
-        if (playerData == null) {
-            GriefPrevention.AddLogEntry("PlayerData for player " + player.getName() + " is null. Cannot process PlayerInteractEvent.", CustomLogEntryTypes.Debug);
-            return;
-        }
-
-        // Turtle eggs
+        //Turtle eggs
         if (action == Action.PHYSICAL)
         {
             if (clickedBlockType != Material.TURTLE_EGG)
@@ -1574,7 +1568,7 @@ class PlayerEventHandler implements Listener
                                 clickedBlockType == Material.STONECUTTER ||
                                 clickedBlockType == Material.SWEET_BERRY_BUSH ||
                                 clickedBlockType == Material.DECORATED_POT
-                )))
+                        )))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 
@@ -1615,13 +1609,13 @@ class PlayerEventHandler implements Listener
 
                 (instance.config_claims_lockWoodenDoors && Tag.DOORS.isTagged(clickedBlockType) ||
 
-                        instance.config_claims_preventButtonsSwitches && Tag.BEDS.isTagged(clickedBlockType) ||
+                instance.config_claims_preventButtonsSwitches && Tag.BEDS.isTagged(clickedBlockType) ||
 
-                        instance.config_claims_lockTrapDoors && Tag.TRAPDOORS.isTagged(clickedBlockType) ||
+                instance.config_claims_lockTrapDoors && Tag.TRAPDOORS.isTagged(clickedBlockType) ||
 
-                        instance.config_claims_lecternReadingRequiresAccessTrust && clickedBlockType == Material.LECTERN ||
+                instance.config_claims_lecternReadingRequiresAccessTrust && clickedBlockType == Material.LECTERN ||
 
-                        instance.config_claims_lockFenceGates && Tag.FENCE_GATES.isTagged(clickedBlockType)))
+                instance.config_claims_lockFenceGates && Tag.FENCE_GATES.isTagged(clickedBlockType)))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
             Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
