@@ -429,7 +429,7 @@ class PlayerEventHandler implements Listener
         CommandCategory category = this.getCommandCategory(command);
 
         Player player = event.getPlayer();
-        PlayerData playerData = null;
+        PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 
         //if a whisper
         if (category == CommandCategory.Whisper && command.getArgumentCount() > 1)
@@ -1512,7 +1512,7 @@ class PlayerEventHandler implements Listener
             clickedBlockType = Material.AIR;
         }
 
-        PlayerData playerData = null;
+        PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 
         //Turtle eggs
         if (action == Action.PHYSICAL)
