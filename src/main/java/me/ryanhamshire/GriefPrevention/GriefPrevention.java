@@ -2275,13 +2275,23 @@ public class GriefPrevention extends JavaPlugin
         // claimban
         else if (cmd.getName().equals("claimban"))
         {
-            return conaxGP.claimban(sender, args[0]);
+            if (args.length > 0) {
+                return conaxGP.claimban(sender, args[0]);
+            } else {
+                sender.sendMessage("Usage: /claimban <player>");
+                return false;
+            }
         }
 
         // claimunban
         else if (cmd.getName().equals("claimunban"))
         {
-            return conaxGP.claimunban(sender, args[0]);
+            if (args.length > 0) {
+                return conaxGP.claimunban(sender, args[0]);
+            } else {
+                sender.sendMessage("Usage: /claimunban <player>");
+                return false;
+            }
         }
 
         // claimban list
