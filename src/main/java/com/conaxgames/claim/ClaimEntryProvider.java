@@ -26,6 +26,13 @@ public class ClaimEntryProvider
      */
     public boolean isBlocked(UUID claimOwner, UUID attemptingToEnter)
     {
+        // Check if claimOwner is null before proceeding
+        if (claimOwner == null) {
+            // Log a warning or handle the null case appropriately
+            System.out.println("Warning: claimOwner is null.");
+            return false;  // Or handle this case based on your logic
+        }
+
         if (config.contains(claimOwner.toString()))
         {
             List<String> bans = config.getStringList(claimOwner.toString());
